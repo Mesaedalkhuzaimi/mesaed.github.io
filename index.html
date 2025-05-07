@@ -1,196 +1,43 @@
-<p style="font-weight:bold; font-size: 16px; color: #555;">هذا الموقع بتصميم وإعداد وتنفيذ: <span style="color:#00703c">مساعد سالم الخزيمي</span></p>
-<h1>🎁 صندوق الهوية الإماراتية</h1>
-<p>اضغط على الصندوق لاكتشاف كنز من الهوية الوطنية!</p>
 
-<audio id="openSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7cfc1f91db.mp3?filename=unfold-103126.mp3"></audio>
-<audio id="correctSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5508ae1195.mp3?filename=magic-chime-7033.mp3"></audio>
-<audio id="wrongSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0099e8d61d.mp3?filename=error-126627.mp3"></audio>
-<audio id="timeUpSound" src="https://cdn.pixabay.com/download/audio/2022/03/03/audio_49e207dc89.mp3?filename=time-over-113126.mp3"></audio>
-
-<div id="box" class="card" onclick="revealCard()">
-  <div class="card-inner">
-    <div class="card-front"></div>
-    <div class="card-back" id="card-content"></div>
-  </div>
-</div>
-
-<div id="score">النقاط: 0</div>
-<div id="timer"></div>
-
-<script>
-  let score = 0;
-  let timerInterval;
-  const openSound = document.getElementById("openSound");
-  const correctSound = document.getElementById("correctSound");
-  const wrongSound = document.getElementById("wrongSound");
-  const timeUpSound = document.getElementById("timeUpSound");
-
-  const cards = [
-    {
-      question: "ما هو شعار دولة الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Emblem_of_the_United_Arab_Emirates.svg/320px-Emblem_of_the_United_Arab_Emirates.svg.png",
-      options: ["نسر ذهبي", "صقر فضي", "باز أحمر"],
-      correct: "نسر ذهبي"
-    },
-    {
-      question: "كم عدد الإمارات في دولة الإمارات العربية المتحدة؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/UAE_emirates_map_ar.png/320px-UAE_emirates_map_ar.png",
-      options: ["7", "5", "9"],
-      correct: "7"
-    },
-    {
-      question: "ما اسم العملة الرسمية لدولة الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/UAE_dirham_1_coin.jpg/320px-UAE_dirham_1_coin.jpg",
-      options: ["درهم", "ريال", "دينار"],
-      correct: "درهم"
-    },
-    {
-      question: "ما اسم البرج الأطول في العالم الموجود في الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Burj_Khalifa.jpg/320px-Burj_Khalifa.jpg",
-      options: ["برج خليفة", "برج العرب", "برج الإمارات"],
-      correct: "برج خليفة"
-    },
-    {
-      question: "من هو مؤسس دولة الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Zayed_bin_Sultan.jpg/320px-Zayed_bin_Sultan.jpg",
-      options: ["الشيخ زايد بن سلطان آل نهيان", "الشيخ راشد بن سعيد", "الشيخ محمد بن راشد"],
-      correct: "الشيخ زايد بن سلطان آل نهيان"
-    },
-    {
-      question: "ما اسم المسبار الإماراتي الذي أُرسل إلى المريخ؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Emirates_Mars_Mission_%28Hope_Probe%29.jpg/320px-Emirates_Mars_Mission_%28Hope_Probe%29.jpg",
-      options: ["مسبار الأمل", "مسبار الطموح", "مسبار المستقبل"],
-      correct: "مسبار الأمل"
-    },
-    {
-      question: "في أي عام تأسست دولة الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/UAE_union_day.jpg/320px-UAE_union_day.jpg",
-      options: ["1971", "1965", "1980"],
-      correct: "1971"
-    },
-    {
-      question: "ما ألوان علم الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_United_Arab_Emirates.svg/320px-Flag_of_the_United_Arab_Emirates.svg.png",
-      options: ["أخضر، أبيض، أسود، أحمر", "أحمر، أزرق، أصفر", "أخضر، أحمر، برتقالي"],
-      correct: "أخضر، أبيض، أسود، أحمر"
-    },
-    {
-      question: "ما هو تاريخ يوم العلم في الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/UAE_Flag_Day.jpg/320px-UAE_Flag_Day.jpg",
-      options: ["3 نوفمبر", "2 ديسمبر", "1 يناير"],
-      correct: "3 نوفمبر"
-    },
-    {
-      question: "ما هو لقب الشيخ زايد في قلوب الشعب؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Zayed_bin_Sultan.jpg/320px-Zayed_bin_Sultan.jpg",
-      options: ["زايد الخير", "زايد الاتحاد", "زايد الأب"],
-      correct: "زايد الخير"
-    },
-    {
-      question: "ما اسم الجواز الرسمي للمواطنين في الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/UAE_Passport.png/320px-UAE_Passport.png",
-      options: ["جواز السفر الإماراتي", "بطاقة الهوية", "تأشيرة الاتحاد"],
-      correct: "جواز السفر الإماراتي"
-    },
-    {
-      question: "ما اسم البطاقة التي يحملها المواطن والمقيم في الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/UAE_ID_Card_Sample.png/320px-UAE_ID_Card_Sample.png",
-      options: ["بطاقة الهوية", "بطاقة التبرع", "بطاقة الطالب"],
-      correct: "بطاقة الهوية"
-    },
-    {
-      question: "في أي إمارة يقع قصر الحصن التاريخي؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Qasr_Al_Hosn_Abu_Dhabi.jpg/320px-Qasr_Al_Hosn_Abu_Dhabi.jpg",
-      options: ["أبوظبي", "دبي", "الشارقة"],
-      correct: "أبوظبي"
-    },
-    {
-      question: "في أي إمارة يقع برج العرب؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Burj_Al_Arab_Dubai.jpg/320px-Burj_Al_Arab_Dubai.jpg",
-      options: ["دبي", "أبوظبي", "رأس الخيمة"],
-      correct: "دبي"
-    },
-    {
-      question: "ما اسم المبادرة التي أطلقتها الإمارات لتحقيق الحياد المناخي؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/COP28_Logo.png/320px-COP28_Logo.png",
-      options: ["مبادرة الإمارات الاستراتيجية للحياد المناخي", "عام الاستدامة", "مبادرة الطاقة الشمسية"],
-      correct: "مبادرة الإمارات الاستراتيجية للحياد المناخي"
-    },
-    {
-      question: "ما اسم القمر الصناعي الإماراتي الذي أُطلق لمراقبة الأرض؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/KhalifaSat_launch.jpg/320px-KhalifaSat_launch.jpg",
-      options: ["خليفة سات", "زايد سات", "الاتحاد سات"],
-      correct: "خليفة سات"
-    },
-    {
-      question: "ما اسم أضخم مشروع للطاقة الشمسية في الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Mohammed_bin_Rashid_Al_Maktoum_Solar_Park.jpg/320px-Mohammed_bin_Rashid_Al_Maktoum_Solar_Park.jpg",
-      options: ["مجمع محمد بن راشد للطاقة الشمسية", "مشروع زايد للطاقة المتجددة", "محطة الاتحاد للطاقة"],
-      correct: "مجمع محمد بن راشد للطاقة الشمسية"
-    },
-    {
-      question: "ما اسم المدينة التي تضم متحف المستقبل؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Museum_of_the_Future_Dubai.jpg/320px-Museum_of_the_Future_Dubai.jpg",
-      options: ["دبي", "الشارقة", "أبوظبي"],
-      correct: "دبي"
-    },
-    {
-      question: "ما اسم الوثيقة التي أُعلنت عند قيام الاتحاد؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/UAE_Union_Declaration.jpg/320px-UAE_Union_Declaration.jpg",
-      options: ["إعلان الاتحاد", "دستور الإمارات", "وثيقة الاتحاد السبع"],
-      correct: "إعلان الاتحاد"
-    },
-    {
-      question: "ما اسم المدينة التي تستضيف معرض إكسبو 2020؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/EXPO_2020_entrance_gate.jpg/320px-EXPO_2020_entrance_gate.jpg",
-      options: ["دبي", "أبوظبي", "العين"],
-      correct: "دبي"
-    },
-    {
-      question: "ما اسم العاصمة الثقافية لدولة الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Sharjah_University_City.jpg/320px-Sharjah_University_City.jpg",
-      options: ["الشارقة", "العين", "دبي"],
-      correct: "الشارقة"
-    },
-    {
-      question: "ما اسم المجلس الذي يضم حكام الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Federal_Supreme_Council_UAE.jpg/320px-Federal_Supreme_Council_UAE.jpg",
-      options: ["المجلس الأعلى للاتحاد", "مجلس الوزراء", "مجلس التنمية الوطني"],
-      correct: "المجلس الأعلى للاتحاد"
-    },
-    {
-      question: "ما اسم المناسبة التي تحتفل بها الإمارات في 2 ديسمبر؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/UAE_National_Day_Parade.jpg/320px-UAE_National_Day_Parade.jpg",
-      options: ["اليوم الوطني", "يوم العلم", "يوم الاتحاد"],
-      correct: "اليوم الوطني"
-    },
-    {
-      question: "ما اسم الإمارة التي يوجد فيها جبل جيس؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Jebel_Jais_RAK.jpg/320px-Jebel_Jais_RAK.jpg",
-      options: ["رأس الخيمة", "الفجيرة", "أم القيوين"],
-      correct: "رأس الخيمة"
-    },
-    {
-      question: "ما اسم المدينة التي يوجد فيها قصر المويجعي؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Al_Muwaiji_Palace_in_Al_Ain.jpg/320px-Al_Muwaiji_Palace_in_Al_Ain.jpg",
-      options: ["العين", "الشارقة", "دبي"],
-      correct: "العين"
-    },
-    {
-      question: "ما اسم الإمارة التي يقع فيها مسجد الشيخ زايد الكبير؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Sheikh_Zayed_Mosque_AUH.jpg/320px-Sheikh_Zayed_Mosque_AUH.jpg",
-      options: ["أبوظبي", "دبي", "عجمان"],
-      correct: "أبوظبي"
-    },
-    {
-      question: "ما اسم الجائزة الإماراتية العالمية في العمل الإنساني؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Mohammed_Bin_Rashid_Award_Humanitarian.jpg/320px-Mohammed_Bin_Rashid_Award_Humanitarian.jpg",
-      options: ["جائزة محمد بن راشد آل مكتوم للإنسانية", "جائزة زايد للسلام", "جائزة الإمارات للخير"],
-      correct: "جائزة محمد بن راشد آل مكتوم للإنسانية"
-    },
-    {
-      question: "ما اسم المبادرة التي أطلقتها الإمارات عام 2023 لتعزيز الاستدامة؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Year_of_Sustainability_UAE_Logo.png/320px-Year_of_Sustainability_UAE_Logo.png",
-      options: ["عام الاستدامة", "عام الخير", "عام التسامح"],
-      correct: "عام الاستدامة"
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>صندوق الهوية الإماراتية</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #fffbe6, #e0f7fa);
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 30px;
     }
+    #box {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Flag_of_the_United_Arab_Emirates.svg/320px-Flag_of_the_United_Arab_Emirates.svg.png');
+      background-size: cover;
+      width: 250px;
+      height: 250px;
+      margin: 50px auto;
+      border: 8px solid #00703c;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.6s;
+    }
+    #box:hover {
+      transform: scale(1.05);
+    }
+    .welcome {
+      font-weight: bold;
+      color: #00703c;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <p class="welcome">هذا الموقع بتصميم وإعداد وتنفيذ: مساعد سالم الخزيمي</p>
+  <div id="box" onclick="alert('السؤال سيظهر هنا مع المؤثرات')"></div>
+  <p>اضغط على الصندوق لاكتشاف الأسئلة التفاعلية!</p>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/50px-Instagram_icon.png" style="margin-top:20px;" />
+  <p>@MESAED.ALKHUZAIMI</p>
+</body>
+</html>
