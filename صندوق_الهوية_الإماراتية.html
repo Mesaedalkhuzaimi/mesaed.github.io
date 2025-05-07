@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صندوق الهوية الإماراتية - تحدي أبطال الإمارات</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 50px;
+      direction: rtl;
+    }
+    h1 {
+      color: #00703c;
+    }
+    #box {
+      width: 200px;
+      height: 200px;
+      margin: 30px auto;
+      background-color: #fff;
+      border: 3px solid #00703c;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #box:hover {
+      background-color: #e6f3ea;
+    }
+    #content {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #333;
+    }
+    .card {
+      border: 2px dashed #00703c;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      margin-bottom: 20px;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    .options button {
+      margin: 5px;
+      padding: 10px 20px;
+      background-color: #00703c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background-color: #005a2c;
+    }
+    #score {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #00703c;
+    }
+    #award {
+      font-size: 22px;
+      margin-top: 30px;
+      color: #d4af37;
+    }
+  </style>
+</head>
+<body>
+
+<h1>صندوق الهوية الإماراتية</h1>
+<p>اضغط على الصندوق لاكتشاف كنز من الهوية الوطنية!</p>
+
+<div id="box" onclick="revealCard()">
+  <strong>افتح الصندوق</strong>
+</div>
+
+<div id="content"></div>
+<div id="score">النقاط: 0</div>
+<div id="award"></div>
+
+<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+<audio id="awardSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+
+<script>
+  let score = 0;
+
+  const cards = [
+    {
+      question: "من هو مؤسس دولة الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Zayed_bin_Sultan_Al_Nahyan.png/400px-Zayed_bin_Sultan_Al_Nahyan.png",
+      options: ["الشيخ زايد", "الشيخ راشد", "الشيخ خليفة"],
+      correct: "الشيخ زايد"
+    },
+    {
+      question: "أين وُقعت وثيقة الاتحاد؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Union_House_Dubai_2011.jpg/400px-Union_House_Dubai_2011.jpg",
+      options: ["دار الاتحاد", "قصر الوطن", "برج العرب"],
+      correct: "دار الاتحاد"
+    },
+    {
+      question: "من هو أول رائد فضاء إماراتي؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Hazzaa_AlMansoori.jpg/400px-Hazzaa_AlMansoori.jpg",
+      options: ["هزاع المنصوري", "سلطان النيادي", "زايد الطيار"],
+      correct: "هزاع المنصوري"
+    },
+    {
+      question: "ما معنى اللون الأبيض في علم الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_United_Arab_Emirates.svg/400px-Flag_of_the_United_Arab_Emirates.svg.png",
+      options: ["السلام", "الشجاعة", "القوة"],
+      correct: "السلام"
+    },
+    {
+      question: "في أي مدينة أقيم معرض إكسبو 2020؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Expo_2020_dome.jpg/400px-Expo_2020_dome.jpg",
+      options: ["دبي", "أبوظبي", "الشارقة"],
+      correct: "دبي"
+    }
+  ];
+
+  function revealCard() {
+    const randomIndex = Math.floor(Math.random() * cards.length);
+    const card = cards[randomIndex];
+
+    let optionsHtml = '<div class="options">';
+    card.options.forEach(option => {
+      optionsHtml += `<button onclick="checkAnswer('${option}','${card.correct}')">${option}</button>`;
+    });
+    optionsHtml += '</div>';
+
+    const cardHtml = `
+      <div class="card">
+        <h3>${card.question}</h3>
+        <img src="${card.image}" alt="صورة">
+        ${optionsHtml}
+      </div>
+    `;
+
+    document.getElementById('content').innerHTML = cardHtml;
+  }
+
+  function checkAnswer(selected, correct) {
+    if (selected === correct) {
+      document.getElementById("correctSound").play();
+      alert("إجابة صحيحة! 🌟");
+      score++;
+    } else {
+      document.getElementById("wrongSound").play();
+      alert("إجابة خاطئة ❌");
+    }
+    document.getElementById('score').innerText = `النقاط: ${score}`;
+
+    if (score === 5) {
+      document.getElementById("award").innerHTML = "🎖️ تهانينا! حصلت على وسام بطل الهوية الإماراتية!";
+      document.getElementById("awardSound").play();
+    }
+
+    revealCard();
+  }
+</script>
+
+</body>
+</html>
