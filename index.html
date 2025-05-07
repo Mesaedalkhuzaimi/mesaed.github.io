@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -7,14 +6,25 @@
   <title>صندوق الهوية الإماراتية - تحدي أبطال الإمارات</title>
   <style>
     body {
-      background-color: #f2f2f2;
+      background: linear-gradient(to right, #cce5ff, #e6ffe6);
       font-family: 'Arial', sans-serif;
       text-align: center;
       padding: 50px;
       direction: rtl;
+      animation: backgroundMove 10s infinite alternate;
+    }
+    @keyframes backgroundMove {
+      0% { background-position: left; }
+      100% { background-position: right; }
     }
     h1 {
       color: #00703c;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); color: #00703c; }
+      50% { transform: scale(1.1); color: #00a86b; }
+      100% { transform: scale(1); color: #00703c; }
     }
     #box {
       width: 200px;
@@ -28,6 +38,7 @@
       justify-content: center;
       cursor: pointer;
       transition: background-color 0.3s;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
     #box:hover {
       background-color: #e6f3ea;
@@ -43,6 +54,7 @@
       border-radius: 10px;
       background-color: #ffffff;
       margin-bottom: 20px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
     img {
       max-width: 100%;
@@ -57,9 +69,11 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      transition: transform 0.2s;
     }
     .options button:hover {
       background-color: #005a2c;
+      transform: scale(1.05);
     }
     #score {
       margin-top: 20px;
@@ -76,7 +90,18 @@
 </head>
 <body>
 
-<h1>صندوق الهوية الإماراتية</h1>
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_c20d7b2d3a.mp3" type="audio/mpeg">
+  متصفحك لا يدعم تشغيل الصوت التلقائي.
+</audio>
+<audio id="sound-correct">
+  <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_d7ac5b52f7.mp3" type="audio/mpeg">
+</audio>
+<audio id="sound-wrong">
+  <source src="https://cdn.pixabay.com/audio/2022/03/31/audio_91ec37fe3f.mp3" type="audio/mpeg">
+</audio>
+
+<h1>🎁 صندوق الهوية الإماراتية</h1>
 <p>اضغط على الصندوق لاكتشاف كنز من الهوية الوطنية!</p>
 
 <div id="box" onclick="revealCard()">
@@ -87,41 +112,39 @@
 <div id="score">النقاط: 0</div>
 <div id="award"></div>
 
-<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
-<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
-<audio id="awardSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
-
 <script>
   let score = 0;
+  const correctSound = document.getElementById('sound-correct');
+  const wrongSound = document.getElementById('sound-wrong');
 
   const cards = [
     {
       question: "من هو مؤسس دولة الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Zayed_bin_Sultan_Al_Nahyan.png/400px-Zayed_bin_Sultan_Al_Nahyan.png",
+      image: "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
       options: ["الشيخ زايد", "الشيخ راشد", "الشيخ خليفة"],
       correct: "الشيخ زايد"
     },
     {
       question: "أين وُقعت وثيقة الاتحاد؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Union_House_Dubai_2011.jpg/400px-Union_House_Dubai_2011.jpg",
+      image: "https://cdn-icons-png.flaticon.com/512/888/888879.png",
       options: ["دار الاتحاد", "قصر الوطن", "برج العرب"],
       correct: "دار الاتحاد"
     },
     {
       question: "من هو أول رائد فضاء إماراتي؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Hazzaa_AlMansoori.jpg/400px-Hazzaa_AlMansoori.jpg",
+      image: "https://cdn-icons-png.flaticon.com/512/4320/4320389.png",
       options: ["هزاع المنصوري", "سلطان النيادي", "زايد الطيار"],
       correct: "هزاع المنصوري"
     },
     {
       question: "ما معنى اللون الأبيض في علم الإمارات؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_United_Arab_Emirates.svg/400px-Flag_of_the_United_Arab_Emirates.svg.png",
+      image: "https://cdn-icons-png.flaticon.com/512/197/197374.png",
       options: ["السلام", "الشجاعة", "القوة"],
       correct: "السلام"
     },
     {
       question: "في أي مدينة أقيم معرض إكسبو 2020؟",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Expo_2020_dome.jpg/400px-Expo_2020_dome.jpg",
+      image: "https://cdn-icons-png.flaticon.com/512/3176/3176362.png",
       options: ["دبي", "أبوظبي", "الشارقة"],
       correct: "دبي"
     }
@@ -133,7 +156,7 @@
 
     let optionsHtml = '<div class="options">';
     card.options.forEach(option => {
-      optionsHtml += `<button onclick="checkAnswer('${option}','${card.correct}')">${option}</button>`;
+      optionsHtml += `<button onclick=\"checkAnswer('${option}','${card.correct}')\">${option}</button>`;
     });
     optionsHtml += '</div>';
 
@@ -150,18 +173,17 @@
 
   function checkAnswer(selected, correct) {
     if (selected === correct) {
-      document.getElementById("correctSound").play();
+      correctSound.play();
       alert("إجابة صحيحة! 🌟");
       score++;
     } else {
-      document.getElementById("wrongSound").play();
+      wrongSound.play();
       alert("إجابة خاطئة ❌");
     }
     document.getElementById('score').innerText = `النقاط: ${score}`;
 
     if (score === 5) {
       document.getElementById("award").innerHTML = "🎖️ تهانينا! حصلت على وسام بطل الهوية الإماراتية!";
-      document.getElementById("awardSound").play();
     }
 
     revealCard();
