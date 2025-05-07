@@ -1,194 +1,196 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>صندوق الهوية الإماراتية - تحدي أبطال الإمارات</title>
-  <style>
-    body {
-      background: linear-gradient(to right, #cce5ff, #e6ffe6);
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      padding: 50px;
-      direction: rtl;
-      animation: backgroundMove 10s infinite alternate;
-    }
-    @keyframes backgroundMove {
-      0% { background-position: left; }
-      100% { background-position: right; }
-    }
-    h1 {
-      color: #00703c;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); color: #00703c; }
-      50% { transform: scale(1.1); color: #00a86b; }
-      100% { transform: scale(1); color: #00703c; }
-    }
-    #box {
-      width: 200px;
-      height: 200px;
-      margin: 30px auto;
-      background-color: #fff;
-      border: 3px solid #00703c;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    #box:hover {
-      background-color: #e6f3ea;
-    }
-    #content {
-      margin-top: 30px;
-      font-size: 18px;
-      color: #333;
-    }
-    .card {
-      border: 2px dashed #00703c;
-      padding: 20px;
-      border-radius: 10px;
-      background-color: #ffffff;
-      margin-bottom: 20px;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    }
-    img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-top: 15px;
-    }
-    .options button {
-      margin: 5px;
-      padding: 10px 20px;
-      background-color: #00703c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .options button:hover {
-      background-color: #005a2c;
-      transform: scale(1.05);
-    }
-    #score {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #00703c;
-    }
-    #award {
-      font-size: 22px;
-      margin-top: 30px;
-      color: #d4af37;
-    }
-  </style>
-</head>
-<body>
-
-<audio autoplay loop>
-  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_c20d7b2d3a.mp3" type="audio/mpeg">
-  متصفحك لا يدعم تشغيل الصوت التلقائي.
-</audio>
-<audio id="sound-correct">
-  <source src="https://cdn.pixabay.com/audio/2022/03/30/audio_d7ac5b52f7.mp3" type="audio/mpeg">
-</audio>
-<audio id="sound-wrong">
-  <source src="https://cdn.pixabay.com/audio/2022/03/31/audio_91ec37fe3f.mp3" type="audio/mpeg">
-</audio>
-
+<p style="font-weight:bold; font-size: 16px; color: #555;">هذا الموقع بتصميم وإعداد وتنفيذ: <span style="color:#00703c">مساعد سالم الخزيمي</span></p>
 <h1>🎁 صندوق الهوية الإماراتية</h1>
 <p>اضغط على الصندوق لاكتشاف كنز من الهوية الوطنية!</p>
 
-<div id="box" onclick="revealCard()">
-  <strong>افتح الصندوق</strong>
+<audio id="openSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7cfc1f91db.mp3?filename=unfold-103126.mp3"></audio>
+<audio id="correctSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5508ae1195.mp3?filename=magic-chime-7033.mp3"></audio>
+<audio id="wrongSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0099e8d61d.mp3?filename=error-126627.mp3"></audio>
+<audio id="timeUpSound" src="https://cdn.pixabay.com/download/audio/2022/03/03/audio_49e207dc89.mp3?filename=time-over-113126.mp3"></audio>
+
+<div id="box" class="card" onclick="revealCard()">
+  <div class="card-inner">
+    <div class="card-front"></div>
+    <div class="card-back" id="card-content"></div>
+  </div>
 </div>
 
-<div id="content"></div>
 <div id="score">النقاط: 0</div>
-<div id="award"></div>
+<div id="timer"></div>
 
 <script>
   let score = 0;
-  const correctSound = document.getElementById('sound-correct');
-  const wrongSound = document.getElementById('sound-wrong');
+  let timerInterval;
+  const openSound = document.getElementById("openSound");
+  const correctSound = document.getElementById("correctSound");
+  const wrongSound = document.getElementById("wrongSound");
+  const timeUpSound = document.getElementById("timeUpSound");
 
   const cards = [
     {
+      question: "ما هو شعار دولة الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Emblem_of_the_United_Arab_Emirates.svg/320px-Emblem_of_the_United_Arab_Emirates.svg.png",
+      options: ["نسر ذهبي", "صقر فضي", "باز أحمر"],
+      correct: "نسر ذهبي"
+    },
+    {
+      question: "كم عدد الإمارات في دولة الإمارات العربية المتحدة؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/UAE_emirates_map_ar.png/320px-UAE_emirates_map_ar.png",
+      options: ["7", "5", "9"],
+      correct: "7"
+    },
+    {
+      question: "ما اسم العملة الرسمية لدولة الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/UAE_dirham_1_coin.jpg/320px-UAE_dirham_1_coin.jpg",
+      options: ["درهم", "ريال", "دينار"],
+      correct: "درهم"
+    },
+    {
+      question: "ما اسم البرج الأطول في العالم الموجود في الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Burj_Khalifa.jpg/320px-Burj_Khalifa.jpg",
+      options: ["برج خليفة", "برج العرب", "برج الإمارات"],
+      correct: "برج خليفة"
+    },
+    {
       question: "من هو مؤسس دولة الإمارات؟",
-      image: "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
-      options: ["الشيخ زايد", "الشيخ راشد", "الشيخ خليفة"],
-      correct: "الشيخ زايد"
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Zayed_bin_Sultan.jpg/320px-Zayed_bin_Sultan.jpg",
+      options: ["الشيخ زايد بن سلطان آل نهيان", "الشيخ راشد بن سعيد", "الشيخ محمد بن راشد"],
+      correct: "الشيخ زايد بن سلطان آل نهيان"
     },
     {
-      question: "أين وُقعت وثيقة الاتحاد؟",
-      image: "https://cdn-icons-png.flaticon.com/512/888/888879.png",
-      options: ["دار الاتحاد", "قصر الوطن", "برج العرب"],
-      correct: "دار الاتحاد"
+      question: "ما اسم المسبار الإماراتي الذي أُرسل إلى المريخ؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Emirates_Mars_Mission_%28Hope_Probe%29.jpg/320px-Emirates_Mars_Mission_%28Hope_Probe%29.jpg",
+      options: ["مسبار الأمل", "مسبار الطموح", "مسبار المستقبل"],
+      correct: "مسبار الأمل"
     },
     {
-      question: "من هو أول رائد فضاء إماراتي؟",
-      image: "https://cdn-icons-png.flaticon.com/512/4320/4320389.png",
-      options: ["هزاع المنصوري", "سلطان النيادي", "زايد الطيار"],
-      correct: "هزاع المنصوري"
+      question: "في أي عام تأسست دولة الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/UAE_union_day.jpg/320px-UAE_union_day.jpg",
+      options: ["1971", "1965", "1980"],
+      correct: "1971"
     },
     {
-      question: "ما معنى اللون الأبيض في علم الإمارات؟",
-      image: "https://cdn-icons-png.flaticon.com/512/197/197374.png",
-      options: ["السلام", "الشجاعة", "القوة"],
-      correct: "السلام"
+      question: "ما ألوان علم الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Flag_of_the_United_Arab_Emirates.svg/320px-Flag_of_the_United_Arab_Emirates.svg.png",
+      options: ["أخضر، أبيض، أسود، أحمر", "أحمر، أزرق، أصفر", "أخضر، أحمر، برتقالي"],
+      correct: "أخضر، أبيض، أسود، أحمر"
     },
     {
-      question: "في أي مدينة أقيم معرض إكسبو 2020؟",
-      image: "https://cdn-icons-png.flaticon.com/512/3176/3176362.png",
-      options: ["دبي", "أبوظبي", "الشارقة"],
+      question: "ما هو تاريخ يوم العلم في الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/UAE_Flag_Day.jpg/320px-UAE_Flag_Day.jpg",
+      options: ["3 نوفمبر", "2 ديسمبر", "1 يناير"],
+      correct: "3 نوفمبر"
+    },
+    {
+      question: "ما هو لقب الشيخ زايد في قلوب الشعب؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Zayed_bin_Sultan.jpg/320px-Zayed_bin_Sultan.jpg",
+      options: ["زايد الخير", "زايد الاتحاد", "زايد الأب"],
+      correct: "زايد الخير"
+    },
+    {
+      question: "ما اسم الجواز الرسمي للمواطنين في الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/UAE_Passport.png/320px-UAE_Passport.png",
+      options: ["جواز السفر الإماراتي", "بطاقة الهوية", "تأشيرة الاتحاد"],
+      correct: "جواز السفر الإماراتي"
+    },
+    {
+      question: "ما اسم البطاقة التي يحملها المواطن والمقيم في الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/UAE_ID_Card_Sample.png/320px-UAE_ID_Card_Sample.png",
+      options: ["بطاقة الهوية", "بطاقة التبرع", "بطاقة الطالب"],
+      correct: "بطاقة الهوية"
+    },
+    {
+      question: "في أي إمارة يقع قصر الحصن التاريخي؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Qasr_Al_Hosn_Abu_Dhabi.jpg/320px-Qasr_Al_Hosn_Abu_Dhabi.jpg",
+      options: ["أبوظبي", "دبي", "الشارقة"],
+      correct: "أبوظبي"
+    },
+    {
+      question: "في أي إمارة يقع برج العرب؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Burj_Al_Arab_Dubai.jpg/320px-Burj_Al_Arab_Dubai.jpg",
+      options: ["دبي", "أبوظبي", "رأس الخيمة"],
       correct: "دبي"
+    },
+    {
+      question: "ما اسم المبادرة التي أطلقتها الإمارات لتحقيق الحياد المناخي؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/COP28_Logo.png/320px-COP28_Logo.png",
+      options: ["مبادرة الإمارات الاستراتيجية للحياد المناخي", "عام الاستدامة", "مبادرة الطاقة الشمسية"],
+      correct: "مبادرة الإمارات الاستراتيجية للحياد المناخي"
+    },
+    {
+      question: "ما اسم القمر الصناعي الإماراتي الذي أُطلق لمراقبة الأرض؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/KhalifaSat_launch.jpg/320px-KhalifaSat_launch.jpg",
+      options: ["خليفة سات", "زايد سات", "الاتحاد سات"],
+      correct: "خليفة سات"
+    },
+    {
+      question: "ما اسم أضخم مشروع للطاقة الشمسية في الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Mohammed_bin_Rashid_Al_Maktoum_Solar_Park.jpg/320px-Mohammed_bin_Rashid_Al_Maktoum_Solar_Park.jpg",
+      options: ["مجمع محمد بن راشد للطاقة الشمسية", "مشروع زايد للطاقة المتجددة", "محطة الاتحاد للطاقة"],
+      correct: "مجمع محمد بن راشد للطاقة الشمسية"
+    },
+    {
+      question: "ما اسم المدينة التي تضم متحف المستقبل؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Museum_of_the_Future_Dubai.jpg/320px-Museum_of_the_Future_Dubai.jpg",
+      options: ["دبي", "الشارقة", "أبوظبي"],
+      correct: "دبي"
+    },
+    {
+      question: "ما اسم الوثيقة التي أُعلنت عند قيام الاتحاد؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/UAE_Union_Declaration.jpg/320px-UAE_Union_Declaration.jpg",
+      options: ["إعلان الاتحاد", "دستور الإمارات", "وثيقة الاتحاد السبع"],
+      correct: "إعلان الاتحاد"
+    },
+    {
+      question: "ما اسم المدينة التي تستضيف معرض إكسبو 2020؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/EXPO_2020_entrance_gate.jpg/320px-EXPO_2020_entrance_gate.jpg",
+      options: ["دبي", "أبوظبي", "العين"],
+      correct: "دبي"
+    },
+    {
+      question: "ما اسم العاصمة الثقافية لدولة الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Sharjah_University_City.jpg/320px-Sharjah_University_City.jpg",
+      options: ["الشارقة", "العين", "دبي"],
+      correct: "الشارقة"
+    },
+    {
+      question: "ما اسم المجلس الذي يضم حكام الإمارات؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Federal_Supreme_Council_UAE.jpg/320px-Federal_Supreme_Council_UAE.jpg",
+      options: ["المجلس الأعلى للاتحاد", "مجلس الوزراء", "مجلس التنمية الوطني"],
+      correct: "المجلس الأعلى للاتحاد"
+    },
+    {
+      question: "ما اسم المناسبة التي تحتفل بها الإمارات في 2 ديسمبر؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/UAE_National_Day_Parade.jpg/320px-UAE_National_Day_Parade.jpg",
+      options: ["اليوم الوطني", "يوم العلم", "يوم الاتحاد"],
+      correct: "اليوم الوطني"
+    },
+    {
+      question: "ما اسم الإمارة التي يوجد فيها جبل جيس؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Jebel_Jais_RAK.jpg/320px-Jebel_Jais_RAK.jpg",
+      options: ["رأس الخيمة", "الفجيرة", "أم القيوين"],
+      correct: "رأس الخيمة"
+    },
+    {
+      question: "ما اسم المدينة التي يوجد فيها قصر المويجعي؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Al_Muwaiji_Palace_in_Al_Ain.jpg/320px-Al_Muwaiji_Palace_in_Al_Ain.jpg",
+      options: ["العين", "الشارقة", "دبي"],
+      correct: "العين"
+    },
+    {
+      question: "ما اسم الإمارة التي يقع فيها مسجد الشيخ زايد الكبير؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Sheikh_Zayed_Mosque_AUH.jpg/320px-Sheikh_Zayed_Mosque_AUH.jpg",
+      options: ["أبوظبي", "دبي", "عجمان"],
+      correct: "أبوظبي"
+    },
+    {
+      question: "ما اسم الجائزة الإماراتية العالمية في العمل الإنساني؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Mohammed_Bin_Rashid_Award_Humanitarian.jpg/320px-Mohammed_Bin_Rashid_Award_Humanitarian.jpg",
+      options: ["جائزة محمد بن راشد آل مكتوم للإنسانية", "جائزة زايد للسلام", "جائزة الإمارات للخير"],
+      correct: "جائزة محمد بن راشد آل مكتوم للإنسانية"
+    },
+    {
+      question: "ما اسم المبادرة التي أطلقتها الإمارات عام 2023 لتعزيز الاستدامة؟",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Year_of_Sustainability_UAE_Logo.png/320px-Year_of_Sustainability_UAE_Logo.png",
+      options: ["عام الاستدامة", "عام الخير", "عام التسامح"],
+      correct: "عام الاستدامة"
     }
-  ];
-
-  function revealCard() {
-    const randomIndex = Math.floor(Math.random() * cards.length);
-    const card = cards[randomIndex];
-
-    let optionsHtml = '<div class="options">';
-    card.options.forEach(option => {
-      optionsHtml += `<button onclick=\"checkAnswer('${option}','${card.correct}')\">${option}</button>`;
-    });
-    optionsHtml += '</div>';
-
-    const cardHtml = `
-      <div class="card">
-        <h3>${card.question}</h3>
-        <img src="${card.image}" alt="صورة">
-        ${optionsHtml}
-      </div>
-    `;
-
-    document.getElementById('content').innerHTML = cardHtml;
-  }
-
-  function checkAnswer(selected, correct) {
-    if (selected === correct) {
-      correctSound.play();
-      alert("إجابة صحيحة! 🌟");
-      score++;
-    } else {
-      wrongSound.play();
-      alert("إجابة خاطئة ❌");
-    }
-    document.getElementById('score').innerText = `النقاط: ${score}`;
-
-    if (score === 5) {
-      document.getElementById("award").innerHTML = "🎖️ تهانينا! حصلت على وسام بطل الهوية الإماراتية!";
-    }
-
-    revealCard();
-  }
-</script>
-
-</body>
-</html>
