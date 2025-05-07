@@ -2,13 +2,91 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>صندوق الهوية الإماراتية</title>
+    <meta charset="UTF-8">
+    <title>صندوق الهوية الإماراتية</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #fefcea, #f1da36);
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #000;
+        }
+        .credit {
+            color: green;
+            font-weight: bold;
+        }
+        #boxImage {
+            width: 300px;
+            border: 5px solid green;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0px 0px 15px #888;
+        }
+        #card-content {
+            margin-top: 30px;
+            font-size: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+        #score {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body style="font-family:Arial; text-align:center; background:#f9f9f9; padding:30px;">
-  <h1>🎁 صندوق الهوية الإماراتية</h1>
-  <p style="color:green; font-weight:bold;">هذا الموقع بتصميم وإعداد وتنفيذ: مساعد سالم الخزيمي</p>
-  <p>اضغط على الصندوق لاكتشاف الأسئلة التفاعلية!</p>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/UAE_Gift_Box.png/400px-UAE_Gift_Box.png" style="cursor:pointer; width:250px;" onclick="alert('السؤال سيظهر هنا')">
+<body>
+    <h1>🎁 صندوق الهوية الإماراتية</h1>
+    <p class="credit">هذا الموقع بتصميم وإعداد وتنفيذ: مساعد سالم الخزيمي</p>
+    <p>اضغط على الصندوق لاكتشاف الأسئلة التفاعلية!</p>
+
+    <img src="box.png" id="boxImage" onclick="revealCard()" alt="صندوق تراثي بعلم الإمارات">
+
+    <div id="card-content"></div>
+    <div id="score">النقاط: 0</div>
+
+    <script>
+        let score = 0;
+        let currentIndex = 0;
+
+        const cards = [
+            { question: "ما هو شعار دولة الإمارات؟", image: "q1.png", options: ["نسر ذهبي", "صقر فضي", "باز أحمر"], correct: "نسر ذهبي" },
+            { question: "كم عدد الإمارات في دولة الإمارات؟", image: "q2.png", options: ["7", "5", "9"], correct: "7" },
+            { question: "ما اسم العملة الرسمية لدولة الإمارات؟", image: "q3.png", options: ["درهم", "ريال", "دينار"], correct: "درهم" }
+        ];
+
+        function revealCard() {
+            if (currentIndex >= cards.length) return;
+            const card = cards[currentIndex];
+            const html = `
+                <img src="${card.image}" style="width:250px; border-radius:10px;"><br><br>
+                <strong>${card.question}</strong><br><br>
+                ${card.options.map(option => `<button onclick="checkAnswer('${option}')">${option}</button>`).join(" ")}
+            `;
+            document.getElementById("card-content").innerHTML = html;
+        }
+
+        function checkAnswer(selected) {
+            const card = cards[currentIndex];
+            if (selected === card.correct) {
+                score++;
+                alert("إجابة صحيحة!");
+            } else {
+                alert("إجابة خاطئة!");
+            }
+            currentIndex++;
+            document.getElementById("score").textContent = "النقاط: " + score;
+            if (currentIndex < cards.length) {
+                setTimeout(revealCard, 1000);
+            } else {
+                alert("انتهت الأسئلة! شكراً لمشاركتك");
+            }
+        }
+    </script>
 </body>
 </html>
